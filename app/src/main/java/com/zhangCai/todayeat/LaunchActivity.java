@@ -31,7 +31,7 @@ public class LaunchActivity extends Activity {
                 startActivity(new Intent(LaunchActivity.this, MainActivity.class));
                 LaunchActivity.this.finish();
             }
-        }, 2000);
+        }, 500);
     }
 
     @Override
