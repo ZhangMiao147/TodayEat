@@ -23,9 +23,11 @@ public class MenuAdapter extends BaseAdapter {
 
     private Context mContext;
     private List<String> mData;
+    private int[] mColors;
 
     public MenuAdapter(Context context) {
         mContext = context;
+        mColors = new int[]{R.color.menuBlue, R.color.menuYellow, R.color.menuRed, R.color.menuGreen};
     }
 
     public void addItem(String name) {
@@ -73,10 +75,18 @@ public class MenuAdapter extends BaseAdapter {
             menuHolder = (MenuHolder) convertView.getTag();
         }
         menuHolder.tv_name.setText(mData.get(position));
+        menuHolder.tv_name.setBackgroundResource(mColors[position % mColors.length]);
         menuHolder.tv_name.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.d(TAG, "name:" + mData.get(position));
+            }
+        });
+        menuHolder.tv_name.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+
+                return true;
             }
         });
         return convertView;

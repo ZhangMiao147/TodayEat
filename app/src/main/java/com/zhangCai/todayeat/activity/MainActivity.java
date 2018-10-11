@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.zhangCai.todayeat.R;
@@ -25,6 +26,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private AddDialog mDialog;
     private GridView gv_menu;
     private MenuAdapter mMenuAdapter;
+    private TextView tv_shakeTips; //摇一摇提醒
 
 
     @Override
@@ -41,15 +43,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         iv_add = (ImageView) findViewById(R.id.activity_main_add_iv);
         ll_none = (LinearLayout) findViewById(R.id.activity_main_none_layout_ll);
         gv_menu = (GridView) findViewById(R.id.activity_main_menu_gl);
+        tv_shakeTips = (TextView) findViewById(R.id.activity_main_shake_tips_tv);
         iv_add.setOnClickListener(this);
         mMenuAdapter = new MenuAdapter(getApplicationContext());
         gv_menu.setAdapter(mMenuAdapter);
         if (mMenuAdapter.getCount() == 0) {
             ll_none.setVisibility(View.VISIBLE);
             gv_menu.setVisibility(View.GONE);
+            tv_shakeTips.setVisibility(View.GONE);
         } else {
             ll_none.setVisibility(View.GONE);
             gv_menu.setVisibility(View.VISIBLE);
+            tv_shakeTips.setVisibility(View.VISIBLE);
         }
     }
 
@@ -80,6 +85,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         }
                         if (gv_menu.getVisibility() != View.VISIBLE) {
                             gv_menu.setVisibility(View.VISIBLE);
+                        }
+                        if (tv_shakeTips.getVisibility() != View.VISIBLE) {
+                            tv_shakeTips.setVisibility(View.VISIBLE);
                         }
                     }
                     mMenuAdapter.addItem(input);
