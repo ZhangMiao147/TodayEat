@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.zhangCai.todayeat.R;
@@ -24,10 +25,13 @@ public class MenuAdapter extends BaseAdapter {
     private Context mContext;
     private List<String> mData;
     private int[] mColors;
+    private boolean mShowChoose = false; //显示删除选择
+    private List<String> mItemChooseList; //被选择的链表
 
     public MenuAdapter(Context context) {
         mContext = context;
         mColors = new int[]{R.color.menuBlue, R.color.menuYellow, R.color.menuRed, R.color.menuGreen};
+        mItemChooseList = new ArrayList<>();
     }
 
     public void addItem(String name) {
@@ -69,7 +73,7 @@ public class MenuAdapter extends BaseAdapter {
         MenuHolder menuHolder = null;
         if (convertView == null) {
             convertView = View.inflate(mContext, R.layout.grid_menu_item, null);
-            menuHolder = new MenuHolder((TextView) convertView.findViewById(R.id.grid_menu_name_tv));
+            menuHolder = new MenuHolder(convertView);
             convertView.setTag(menuHolder);
         } else {
             menuHolder = (MenuHolder) convertView.getTag();
@@ -85,19 +89,102 @@ public class MenuAdapter extends BaseAdapter {
         menuHolder.tv_name.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-
+                if (!mShowChoose) {
+                    mShowChoose = true;
+                    mItemChooseList.add(position + "");
+                    if (mOnChooseListener != null) {
+                        mOnChooseListener.onChooseSize(mItemChooseList.size());
+                    }
+                    Log.d(TAG, "onLongClick");
+                    notifyDataSetChanged();
+                }
                 return true;
+            }
+        });
+        Log.d(TAG, "position:" + position + ",mShowChoose:" + mShowChoose);
+        if (mShowChoose) {
+            menuHolder.iv_choose.setVisibility(View.VISIBLE);
+        } else {
+            menuHolder.iv_choose.setVisibility(View.GONE);
+        }
+        if (mItemChooseList.contains(position + "")) {
+            menuHolder.iv_choose.setBackgroundResource(R.mipmap.pick);
+        } else {
+            menuHolder.iv_choose.setBackgroundResource(R.mipmap.choose);
+        }
+        menuHolder.iv_choose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mItemChooseList.contains(position + "")) {
+                    v.setBackgroundResource(R.mipmap.choose);
+                    mItemChooseList.remove(position + "");
+                } else {
+                    v.setBackgroundResource(R.mipmap.pick);
+                    mItemChooseList.add(position + "");
+                }
+                if (mOnChooseListener != null) {
+                    mOnChooseListener.onChooseSize(mItemChooseList.size());
+                }
             }
         });
         return convertView;
     }
 
-    private class MenuHolder {
-        private TextView tv_name;
+    /**
+     * 全选
+     */
+    public void chooseAll() {
+        for (int i = 0; i < mData.size(); i++) {
+            if (!mItemChooseList.contains(i + "")) {
+                mItemChooseList.add(i + "");
+            }
+        }
+        if (mOnChooseListener != null) {
+            mOnChooseListener.onChooseSize(mItemChooseList.size());
+        }
+        notifyDataSetChanged();
+    }
 
-        public MenuHolder(TextView textView) {
-            tv_name = textView;
+    /**
+     * 删除
+     */
+    public void delete() {
+        if (mItemChooseList != null && mItemChooseList.size() > 0) {
+            for (int i = 0; i < mItemChooseList.size(); i++) {
+                int index = Integer.parseInt(mItemChooseList.get(i));
+                mData.remove(index);
+            }
+            mItemChooseList.clear();
+            notifyDataSetChanged();
         }
 
+    }
+
+    /**
+     * 取消删除
+     */
+    public void cancelDelete() {
+        mShowChoose = false;
+        notifyDataSetChanged();
+    }
+
+    private class MenuHolder {
+        private TextView tv_name;
+        private ImageView iv_choose;
+
+        public MenuHolder(View view) {
+            tv_name = (TextView) view.findViewById(R.id.grid_menu_name_tv);
+            iv_choose = (ImageView) view.findViewById(R.id.grid_menu_choose_iv);
+        }
+    }
+
+    private OnChooseListener mOnChooseListener;
+
+    public void setOnChooseListener(OnChooseListener onChooseListener) {
+        this.mOnChooseListener = onChooseListener;
+    }
+
+    public interface OnChooseListener {
+        void onChooseSize(int size);
     }
 }

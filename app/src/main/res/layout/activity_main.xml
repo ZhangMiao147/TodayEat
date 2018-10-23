@@ -6,6 +6,7 @@
     android:orientation="vertical">
 
     <RelativeLayout
+        android:id="@+id/activity_main_add_layout_rl"
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:background="#f25f5c"
@@ -26,6 +27,46 @@
             android:layout_alignParentRight="true"
             android:layout_marginRight="8dp"
             android:src="@mipmap/add" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/activity_main_choose_layout_rl"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="#f25f5c"
+        android:gravity="center_vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/activity_main_choose_finish_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="8dp"
+            android:gravity="center"
+            android:text="完成"
+            android:textColor="@android:color/white"
+            android:textSize="22sp" />
+
+        <TextView
+            android:id="@+id/activity_main_choose_count_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:text="已选择0项"
+            android:textColor="@android:color/white"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/activity_main_choose_all_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="8dp"
+            android:gravity="center"
+            android:text="全选"
+            android:textColor="@android:color/white"
+            android:textSize="22sp" />
     </RelativeLayout>
 
 
@@ -67,11 +108,23 @@
     <GridView
         android:id="@+id/activity_main_menu_gl"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginBottom="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_weight="1"
         android:horizontalSpacing="8dp"
         android:numColumns="2"
         android:verticalSpacing="8dp" />
+
+    <TextView
+        android:id="@+id/activity_main_delete_tv"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:gravity="center"
+        android:text="删除"
+        android:textColor="@android:color/black"
+        android:visibility="gone" />
 
 </LinearLayout>
