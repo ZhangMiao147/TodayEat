@@ -1,6 +1,7 @@
 package com.zhangCai.todayeat.activity;
 
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -51,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initView();
+        hideActionBar();
     }
 
     /**
@@ -109,6 +111,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    /**
+     * 隐藏ActionBar
+     */
+    private void hideActionBar() {
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.hide();
+    }
+
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
@@ -143,14 +153,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 gv_menu.setVisibility(View.GONE);
                 tv_shakeTips.setVisibility(View.GONE);
                 fl_resultLayout.setVisibility(View.VISIBLE);
+                tv_result.setVisibility(View.GONE);
+                iv_result.setVisibility(View.VISIBLE);
                 break;
             case R.id.activity_main_result_iv:
-                int result = (int) (Math.random() * mMenuAdapter.getCount());
+                int result = (int) (Math.random() * (mMenuAdapter.getCount() - 1) + 0.5);
+                Log.d(TAG, "result:" + result);
                 String name = (String) mMenuAdapter.getItem(result);
                 iv_result.setVisibility(View.GONE);
                 tv_result.setVisibility(View.VISIBLE);
                 tv_result.setText(name);
-                tv_result.setBackgroundColor(DefaultValueUtil.MENU_COLORS[result % DefaultValueUtil.MENU_COLORS.length]);
+                tv_result.setBackgroundResource(DefaultValueUtil.MENU_COLORS[result % DefaultValueUtil.MENU_COLORS.length]);
                 tv_sure.setVisibility(View.VISIBLE);
                 break;
             case R.id.activity_main_sure_tv:

@@ -11,4 +11,10 @@
 
     <color name="text_shake_tips">#F25F5C</color>
 
+    <color name="add_name_text_color">#666666</color>
+    <color name="add_name_text_color_hint">#999999</color>
+    <color name="add_cancel_text_color">#333333</color>
+
+    <color name="main_text_color">#404040</color>
+
 </resources>

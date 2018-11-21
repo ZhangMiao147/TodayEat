@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="224dp">
+    android:layout_height="@dimen/gird_menu_item_height">
 
     <TextView
         android:id="@+id/grid_menu_name_tv"
         android:layout_width="match_parent"
-        android:layout_height="224dp"
+        android:layout_height="@dimen/gird_menu_item_height"
         android:background="@color/menuBlue"
         android:gravity="center"
         android:text="@string/app_name"
         android:textColor="@android:color/white"
-        android:textSize="22sp" />
+        android:textSize="@dimen/gird_menu_item_name_text_size" />
 
     <ImageView
         android:id="@+id/grid_menu_choose_iv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginRight="@dimen/gird_menu_item_choose_margin_top_right"
+        android:layout_marginTop="@dimen/gird_menu_item_choose_margin_top_right"
         android:background="@mipmap/choose"
         android:visibility="gone" />
 
