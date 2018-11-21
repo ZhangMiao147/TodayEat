@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">今天吃什么</string>
     <string name="shake_tips">摇一摇手机，看看吃什么吧</string>
+    <string name="eat_sure">就它了</string>
 </resources>

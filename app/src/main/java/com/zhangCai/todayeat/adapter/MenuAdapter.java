@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.zhangCai.todayeat.R;
+import com.zhangCai.todayeat.util.DefaultValueUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,13 +25,11 @@ public class MenuAdapter extends BaseAdapter {
 
     private Context mContext;
     private List<String> mData;
-    private int[] mColors;
     private boolean mShowChoose = false; //显示删除选择
     private List<String> mItemChooseList; //被选择的链表
 
     public MenuAdapter(Context context) {
         mContext = context;
-        mColors = new int[]{R.color.menuBlue, R.color.menuYellow, R.color.menuRed, R.color.menuGreen};
         mItemChooseList = new ArrayList<>();
     }
 
@@ -79,7 +78,7 @@ public class MenuAdapter extends BaseAdapter {
             menuHolder = (MenuHolder) convertView.getTag();
         }
         menuHolder.tv_name.setText(mData.get(position));
-        menuHolder.tv_name.setBackgroundResource(mColors[position % mColors.length]);
+        menuHolder.tv_name.setBackgroundResource(DefaultValueUtil.MENU_COLORS[position % DefaultValueUtil.MENU_COLORS.length]);
         menuHolder.tv_name.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
