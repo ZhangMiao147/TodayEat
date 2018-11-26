@@ -1,6 +1,14 @@
 package com.zhangCai.todayeat.activity;
 
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -19,12 +27,16 @@ import com.zhangCai.todayeat.util.DefaultValueUtil;
 import com.zhangCai.todayeat.util.SPUtils;
 import com.zhangCai.todayeat.view.AddDialog;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 
 /**
  * 主界面
+ *
+ * 摇一摇 https://blog.csdn.net/u013144863/article/details/52958674
+ *
  */
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, SensorEventListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -47,12 +59,87 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TextView tv_result; //结果文字
     private TextView tv_sure; //确定
 
+    private SensorManager mSensorManager;
+    private Sensor mAccelerometerSensor;
+    private boolean isShake = false;
+    private ShakeHandle mShakeHandle;
+
+    SoundPool mSoundPool;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "onCreate");
         setContentView(R.layout.activity_main);
         initView();
         hideActionBar();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d(TAG, "onStart");
+        mShakeHandle = new ShakeHandle(this);
+        mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        if (mSensorManager != null) {
+            mAccelerometerSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+            if (mAccelerometerSensor != null) {
+                mSensorManager.registerListener(this, mAccelerometerSensor, SensorManager.SENSOR_DELAY_UI);
+            }
+        }
+//        mSoundPool = new SoundPool(1, AudioManager.STREAM_SYSTEM,5);
+//        mSoundPool.load()
+    }
+
+    @Override
+    protected void onPause() {
+        if (mSensorManager != null) {
+            mSensorManager.unregisterListener(this);
+        }
+        super.onPause();
+
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        int type = event.sensor.getType();
+
+        if (type == Sensor.TYPE_ACCELEROMETER) {
+            //获取三个方向值
+            float[] values = event.values;
+            float x = values[0];
+            float y = values[1];
+            float z = values[2];
+
+            if ((Math.abs(x) > 17 || Math.abs(y) > 17 || Math.abs(z) > 17) && !isShake) {
+                isShake = true;
+                Thread thread = new Thread() {
+                    @Override
+                    public void run() {
+                        super.run();
+                        try {
+                            mShakeHandle.obtainMessage(ShakeHandle.START_SHAKE).sendToTarget();
+                            Thread.sleep(500);
+                            mShakeHandle.obtainMessage(ShakeHandle.AGAIN_SHAKE).sendToTarget();
+                            Thread.sleep(500);
+                            mShakeHandle.obtainMessage(ShakeHandle.END_SHAKE).sendToTarget();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+
+
+                    }
+                };
+                thread.start();
+            }
+
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
     }
 
     /**
@@ -224,4 +311,39 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             SPUtils.saveStringList(this, DATA_KEY, data);
         }
     }
+
+
+    private static class ShakeHandle extends Handler {
+        private WeakReference<MainActivity> mReference;
+        private MainActivity mActivity;
+
+        public static final int START_SHAKE = 1;
+        public static final int AGAIN_SHAKE = 2;
+        public static final int END_SHAKE = 3;
+
+        public ShakeHandle(MainActivity activity) {
+            mReference = new WeakReference<MainActivity>(activity);
+            if (mReference != null) {
+                mActivity = mReference.get();
+            }
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case START_SHAKE:
+                    break;
+                case AGAIN_SHAKE:
+                    break;
+                case END_SHAKE:
+                    mActivity.isShake = false;
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+
 }
