@@ -16,6 +16,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.zhangCai.todayeat.R;
+import com.zhangCai.todayeat.util.DisplayUtils;
+import com.zhangCai.todayeat.util.SPUtils;
 
 /**
  * Author: zhangmiao
@@ -43,7 +45,7 @@ public class AddDialog extends DialogFragment {
         final Window window = getDialog().getWindow();
         View view = inflater.inflate(R.layout.dialog_add, ((ViewGroup) window.findViewById(android.R.id.content)), false);//需要用android.R.id.content这个view
         window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        window.setLayout(296, 170);
+        window.setLayout(DisplayUtils.dp2px(getContext(), 296), DisplayUtils.dp2px(getContext(), 170));
         return view;
     }
 

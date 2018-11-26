@@ -1,5 +1,6 @@
 package com.zhangCai.todayeat.activity;
 
+import android.content.pm.ActivityInfo;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -9,6 +10,7 @@ import android.media.SoundPool;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Vibrator;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -32,9 +34,8 @@ import java.util.List;
 
 /**
  * 主界面
- *
+ * <p>
  * 摇一摇 https://blog.csdn.net/u013144863/article/details/52958674
- *
  */
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, SensorEventListener {
 
@@ -59,16 +60,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TextView tv_result; //结果文字
     private TextView tv_sure; //确定
 
-    private SensorManager mSensorManager;
+    private SensorManager mSensorManager; //
     private Sensor mAccelerometerSensor;
     private boolean isShake = false;
     private ShakeHandle mShakeHandle;
 
     SoundPool mSoundPool;
+    Vibrator mVibrator; //震动服务
+
+    boolean isCanShake; //是否可以摇一摇
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate");
         setContentView(R.layout.activity_main);
@@ -88,8 +93,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 mSensorManager.registerListener(this, mAccelerometerSensor, SensorManager.SENSOR_DELAY_UI);
             }
         }
-//        mSoundPool = new SoundPool(1, AudioManager.STREAM_SYSTEM,5);
-//        mSoundPool.load()
+        mSoundPool = new SoundPool(1, AudioManager.STREAM_SYSTEM, 5);
+        mSoundPool.load(this, R.raw.shake, 1);
+        mVibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
     }
 
     @Override
@@ -103,6 +109,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onSensorChanged(SensorEvent event) {
+        if (!isCanShake) {
+            return;
+        }
+
         int type = event.sensor.getType();
 
         if (type == Sensor.TYPE_ACCELEROMETER) {
@@ -127,8 +137,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-
-
                     }
                 };
                 thread.start();
@@ -188,10 +196,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         tv_sure.setOnClickListener(this);
 
         if (mMenuAdapter.getCount() == 0) {
+            isCanShake = false;
             ll_none.setVisibility(View.VISIBLE);
             gv_menu.setVisibility(View.GONE);
             tv_shakeTips.setVisibility(View.GONE);
         } else {
+            isCanShake = true;
             ll_none.setVisibility(View.GONE);
             gv_menu.setVisibility(View.VISIBLE);
             tv_shakeTips.setVisibility(View.VISIBLE);
@@ -235,14 +245,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     mMenuAdapter.delete();
                 }
                 break;
-            case R.id.activity_main_shake_tips_tv:
-                //测试摇一摇之后结果显示
-                gv_menu.setVisibility(View.GONE);
-                tv_shakeTips.setVisibility(View.GONE);
-                fl_resultLayout.setVisibility(View.VISIBLE);
-                tv_result.setVisibility(View.GONE);
-                iv_result.setVisibility(View.VISIBLE);
-                break;
             case R.id.activity_main_result_iv:
                 int result = (int) (Math.random() * (mMenuAdapter.getCount() - 1) + 0.5);
                 Log.d(TAG, "result:" + result);
@@ -254,6 +256,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 tv_sure.setVisibility(View.VISIBLE);
                 break;
             case R.id.activity_main_sure_tv:
+                isCanShake = true;
                 fl_resultLayout.setVisibility(View.GONE);
                 tv_sure.setVisibility(View.GONE);
                 tv_shakeTips.setVisibility(View.VISIBLE);
@@ -262,6 +265,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             default:
                 break;
         }
+    }
+
+    public void shake() {
+        isCanShake = false;
+        gv_menu.setVisibility(View.GONE);
+        tv_shakeTips.setVisibility(View.GONE);
+        fl_resultLayout.setVisibility(View.VISIBLE);
+        tv_result.setVisibility(View.GONE);
+        iv_result.setVisibility(View.VISIBLE);
     }
 
     /**
@@ -286,10 +298,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         }
                     }
                     mMenuAdapter.addItem(input);
+                    isCanShake = true;
                 }
 
                 @Override
                 public void showPrompt(String message) {
+                    isCanShake = true;
                     Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
                 }
             });
@@ -301,6 +315,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (mDialog.getDialog() == null || !mDialog.getDialog().isShowing()) {
             mDialog.show(getSupportFragmentManager(), AddDialog.class.getSimpleName());
         }
+        isCanShake = false;
     }
 
     @Override
@@ -308,6 +323,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onDestroy();
         if (mMenuAdapter != null) {
             List<String> data = mMenuAdapter.getData();
+            Log.d(TAG, "onDestroy data:" + data);
             SPUtils.saveStringList(this, DATA_KEY, data);
         }
     }
@@ -331,13 +347,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
+            Log.d(TAG, "handleMessage msg:" + msg);
             switch (msg.what) {
                 case START_SHAKE:
+                    mActivity.mVibrator.vibrate(300);
+                    mActivity.mSoundPool.play(R.raw.shake, 1, 1, 0, 0, 1);
                     break;
                 case AGAIN_SHAKE:
+                    mActivity.mVibrator.vibrate(300);
                     break;
                 case END_SHAKE:
                     mActivity.isShake = false;
+                    mActivity.shake();
                     break;
                 default:
                     break;
