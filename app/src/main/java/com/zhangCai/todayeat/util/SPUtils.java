@@ -25,6 +25,9 @@ public class SPUtils {
      * @param stringList
      */
     public static void saveStringList(Context context, String key, List<String> stringList) {
+        if (stringList == null) {
+            return;
+        }
         if (sSp == null) {
             sSp = context.getSharedPreferences(SP_NAME, Context.MODE_PRIVATE);
         }

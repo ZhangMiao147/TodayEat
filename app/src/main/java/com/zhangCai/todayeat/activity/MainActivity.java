@@ -1,5 +1,9 @@
 package com.zhangCai.todayeat.activity;
 
+import android.animation.Animator;
+import android.animation.AnimatorInflater;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
 import android.content.pm.ActivityInfo;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -15,6 +19,8 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -239,6 +245,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     mMenuAdapter.chooseAll();
                 }
                 break;
+
+//            case R.id.activity_main_shake_tips_tv:
+//                shake();
+//                break;
             case R.id.activity_main_delete_tv:
                 //点击删除
                 if (mMenuAdapter != null) {
@@ -246,16 +256,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 break;
             case R.id.activity_main_result_iv:
+                //显示选择的答案
                 int result = (int) (Math.random() * (mMenuAdapter.getCount() - 1) + 0.5);
                 Log.d(TAG, "result:" + result);
                 String name = (String) mMenuAdapter.getItem(result);
-                iv_result.setVisibility(View.GONE);
                 tv_result.setVisibility(View.VISIBLE);
                 tv_result.setText(name);
                 tv_result.setBackgroundResource(DefaultValueUtil.MENU_COLORS[result % DefaultValueUtil.MENU_COLORS.length]);
                 tv_sure.setVisibility(View.VISIBLE);
+                AnimatorSet inAnimator = (AnimatorSet) AnimatorInflater.loadAnimator(this, R.animator.rotate_in_anim);
+                AnimatorSet outAnimator = (AnimatorSet) AnimatorInflater.loadAnimator(this, R.animator.rotate_out_anim);
+                int distance = 16000;
+                float scale = getResources().getDisplayMetrics().density * distance;
+                iv_result.setCameraDistance(scale);
+                tv_result.setCameraDistance(scale);
+                outAnimator.setTarget(iv_result);
+                inAnimator.setTarget(tv_result);
+                outAnimator.start();
+                inAnimator.start();
+                outAnimator.addListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        super.onAnimationEnd(animation);
+                        iv_result.setVisibility(View.GONE);
+                    }
+                });
                 break;
             case R.id.activity_main_sure_tv:
+                //确定答案
                 isCanShake = true;
                 fl_resultLayout.setVisibility(View.GONE);
                 tv_sure.setVisibility(View.GONE);
