@@ -147,18 +147,19 @@ public class MenuAdapter extends BaseAdapter {
     /**
      * 删除
      */
-    public void delete() {
+    public List<Integer> delete() {
+        List<Integer> deleteList = new ArrayList<>();
         if (mItemChooseList != null && mItemChooseList.size() > 0) {
             for (int i = 0; i < mItemChooseList.size(); i++) {
                 int index = Integer.parseInt(mItemChooseList.get(i));
+                deleteList.add(index);
                 mData.remove(index);
             }
             mItemChooseList.clear();
             notifyDataSetChanged();
         }
-
+        return deleteList;
     }
-
     /**
      * 取消删除
      */
@@ -186,4 +187,6 @@ public class MenuAdapter extends BaseAdapter {
     public interface OnChooseListener {
         void onChooseSize(int size);
     }
+
+
 }

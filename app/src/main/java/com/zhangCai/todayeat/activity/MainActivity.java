@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorInflater;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.content.pm.ActivityInfo;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -19,8 +20,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -36,6 +36,9 @@ import com.zhangCai.todayeat.util.SPUtils;
 import com.zhangCai.todayeat.view.AddDialog;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -251,9 +254,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //                break;
             case R.id.activity_main_delete_tv:
                 //点击删除
-                if (mMenuAdapter != null) {
-                    mMenuAdapter.delete();
-                }
+                delete();
                 break;
             case R.id.activity_main_result_iv:
                 //显示选择的答案
@@ -293,6 +294,99 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             default:
                 break;
         }
+    }
+
+    //连续删除有问题，需查看
+    private void delete() {
+        if (mMenuAdapter != null) {
+            List<Integer> deleteList = mMenuAdapter.delete();
+            if (deleteList != null && deleteList.size() > 0 && mMenuAdapter.getCount() > 0) {
+                animateReorder(deleteList, mMenuAdapter.getCount());
+            }
+        }
+    }
+
+    /**
+     * 删除item后，其他的item需要自动补齐
+     *
+     * @param deleteList
+     * @param itemCount
+     */
+    private void animateReorder(List<Integer> deleteList, int itemCount) {
+        if (deleteList == null || deleteList.size() < 1 || itemCount < 1) {
+            return;
+        }
+
+        List list = new ArrayList();
+        Collections.sort(deleteList);
+        int[] beforeDelete = new int[itemCount + deleteList.size()];
+
+        for (int i = 0; i < deleteList.size(); i++) {
+            beforeDelete[deleteList.get(i)] = -1;
+        }
+        for (int i = 0; i < itemCount; i++) {
+            if (beforeDelete[i] == -1 || beforeDelete[i] != i) {
+                for (int j = i; j < beforeDelete.length; j++) {
+                    if (beforeDelete[j] == 0) {
+                        beforeDelete[j] = i;
+                        break;
+                    }
+                }
+            } else if (beforeDelete[i] != -1) {
+                beforeDelete[i] = i;
+            }
+        }
+        Log.d(TAG, "beforeDelete：" + Arrays.toString(beforeDelete));
+
+        for (int pos = deleteList.get(0); pos < itemCount; pos++) {
+            int beforeDeleteCount = 0;
+            for (int i = 0; i < beforeDelete.length; i++) {
+                if (beforeDelete[i] != pos) {
+                    if (beforeDelete[i] == -1) {
+                        beforeDeleteCount++;
+                    }
+                } else {
+                    break;
+                }
+            }
+            Log.d(TAG, "pos:" + pos + ",beforeDeleteCount:" + beforeDeleteCount);
+            View view = gv_menu.getChildAt(pos - gv_menu.getFirstVisiblePosition());
+            if ((pos + beforeDeleteCount) % gv_menu.getNumColumns() == 0) {
+                int removeHeightCount = beforeDeleteCount / gv_menu.getNumColumns();
+                if (beforeDeleteCount % gv_menu.getNumColumns() != 0) {
+                    removeHeightCount += 1;
+                }
+                list.add(createAnimator(view, -view.getWidth() * (beforeDeleteCount % gv_menu.getNumColumns()), 0, view.getHeight() * removeHeightCount, 0));
+            } else {
+                list.add(createAnimator(view, view.getWidth() * (beforeDeleteCount % gv_menu.getNumColumns()), 0, view.getHeight() * (beforeDeleteCount / gv_menu.getNumColumns()), 0));
+            }
+        }
+        AnimatorSet set = new AnimatorSet();
+        set.playTogether(list);
+        set.setInterpolator(new AccelerateDecelerateInterpolator());
+        set.setDuration(300);
+        set.start();
+    }
+
+    /**
+     * 平移动画
+     *
+     * @param view   需要移动的view
+     * @param startX 开始的X坐标
+     * @param endX   结束的X坐标
+     * @param startY 开始的Y坐标
+     * @param endY   结束的Y坐标
+     * @return
+     */
+    private AnimatorSet createAnimator(View view, float startX,
+                                       float endX, float startY, float endY) {
+        ObjectAnimator animX = ObjectAnimator.ofFloat(view, "translationX",
+                startX, endX);
+        ObjectAnimator animY = ObjectAnimator.ofFloat(view, "translationY",
+                startY, endY);
+        AnimatorSet animSetXY = new AnimatorSet();
+        animSetXY.playTogether(animX, animY);
+        return animSetXY;
     }
 
     public void shake() {
