@@ -12,6 +12,7 @@ import com.zhangCai.todayeat.R;
 import com.zhangCai.todayeat.util.DefaultValueUtil;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -149,6 +150,7 @@ public class MenuAdapter extends BaseAdapter {
      */
     public List<Integer> delete() {
         List<Integer> deleteList = new ArrayList<>();
+        Collections.sort(mItemChooseList);
         if (mItemChooseList != null && mItemChooseList.size() > 0) {
             for (int i = mItemChooseList.size() - 1; i >= 0; i--) {
                 int index = Integer.parseInt(mItemChooseList.get(i));
