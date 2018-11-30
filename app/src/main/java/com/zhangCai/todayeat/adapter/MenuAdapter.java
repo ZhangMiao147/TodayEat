@@ -150,7 +150,7 @@ public class MenuAdapter extends BaseAdapter {
     public List<Integer> delete() {
         List<Integer> deleteList = new ArrayList<>();
         if (mItemChooseList != null && mItemChooseList.size() > 0) {
-            for (int i = 0; i < mItemChooseList.size(); i++) {
+            for (int i = mItemChooseList.size() - 1; i >= 0; i--) {
                 int index = Integer.parseInt(mItemChooseList.get(i));
                 deleteList.add(index);
                 mData.remove(index);
@@ -160,6 +160,7 @@ public class MenuAdapter extends BaseAdapter {
         }
         return deleteList;
     }
+
     /**
      * 取消删除
      */
