@@ -91,6 +91,8 @@ public class AddDialog extends DialogFragment {
                     if (!TextUtils.isEmpty(name)) {
                         if (mInputResultListener != null) {
                             mInputResultListener.result(name);
+                        } else {
+                            dismiss();
                         }
                         et_name.setText("");
                     } else {
@@ -99,7 +101,6 @@ public class AddDialog extends DialogFragment {
                         }
                     }
                 }
-                dismiss();
             }
         });
     }

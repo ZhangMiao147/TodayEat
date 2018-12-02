@@ -79,7 +79,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     boolean isCanShake; //是否可以摇一摇
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -280,12 +279,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     public void onAnimationEnd(Animator animation) {
                         super.onAnimationEnd(animation);
                         iv_result.setVisibility(View.GONE);
+                        iv_result.setAlpha(1.0f);
+                        iv_result.setRotationY(0.0f);
                     }
                 });
                 break;
             case R.id.activity_main_sure_tv:
                 //确定答案
                 isCanShake = true;
+                iv_add.setVisibility(View.VISIBLE);
                 fl_resultLayout.setVisibility(View.GONE);
                 tv_sure.setVisibility(View.GONE);
                 tv_shakeTips.setVisibility(View.VISIBLE);
@@ -304,6 +306,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 animateReorder(deleteList, mMenuAdapter.getCount());
             }
         }
+        saveData();
     }
 
     /**
@@ -389,6 +392,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return animSetXY;
     }
 
+    /**
+     * 摇一摇的反应
+     */
     public void shake() {
         isCanShake = false;
         gv_menu.setVisibility(View.GONE);
@@ -396,6 +402,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         fl_resultLayout.setVisibility(View.VISIBLE);
         tv_result.setVisibility(View.GONE);
         iv_result.setVisibility(View.VISIBLE);
+        iv_add.setVisibility(View.GONE);
     }
 
     /**
@@ -418,9 +425,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         if (tv_shakeTips.getVisibility() != View.VISIBLE) {
                             tv_shakeTips.setVisibility(View.VISIBLE);
                         }
+                        isCanShake = true;
+                        mMenuAdapter.addItem(input);
+                        saveData();
+                        mDialog.dismiss();
+                    } else {
+                        if (mMenuAdapter != null) {
+                            List<String> dataList = mMenuAdapter.getData();
+                            if (dataList != null && dataList.contains(input)) {
+                                Toast.makeText(MainActivity.this, "列表中已经有这个了哦！", Toast.LENGTH_SHORT).show();
+                            } else {
+                                isCanShake = true;
+                                mMenuAdapter.addItem(input);
+                                mDialog.dismiss();
+                                saveData();
+                            }
+                        } else {
+                            isCanShake = true;
+                            mDialog.dismiss();
+                        }
                     }
-                    mMenuAdapter.addItem(input);
-                    isCanShake = true;
                 }
 
                 @Override
@@ -440,9 +464,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         isCanShake = false;
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    /**
+     * 保存数据
+     */
+    private void saveData() {
         if (mMenuAdapter != null) {
             List<String> data = mMenuAdapter.getData();
             Log.d(TAG, "onDestroy data:" + data);
@@ -450,6 +475,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        saveData();
+    }
 
     private static class ShakeHandle extends Handler {
         private WeakReference<MainActivity> mReference;
