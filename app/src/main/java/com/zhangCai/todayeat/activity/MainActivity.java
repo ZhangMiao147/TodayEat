@@ -5,7 +5,11 @@ import android.animation.AnimatorInflater;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.app.Activity;
+import android.app.Application;
+import android.content.ComponentCallbacks;
 import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -16,8 +20,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Vibrator;
+import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -85,6 +91,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate");
+//        setCustomDensity(this,getApplication());
         setContentView(R.layout.activity_main);
         initView();
         hideActionBar();
@@ -486,6 +493,52 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     break;
             }
         }
+    }
+
+
+    private static float sNoncompatDensity;
+    private static float sNoncompatScaleDensity;
+
+    /**
+     * 适配UI，没有找到合适的机器去测试
+     *
+     * @param activity
+     * @param application
+     */
+    private void setCustomDensity(@NonNull Activity activity, @NonNull final Application application) {
+        final DisplayMetrics appDisplayMetrics = application.getResources().getDisplayMetrics();
+
+        if (sNoncompatDensity == 0) {
+            sNoncompatDensity = appDisplayMetrics.density;
+            sNoncompatScaleDensity = appDisplayMetrics.scaledDensity;
+            application.registerComponentCallbacks(new ComponentCallbacks() {
+                @Override
+                public void onConfigurationChanged(Configuration newConfig) {
+                    if (newConfig != null && newConfig.fontScale > 0) {
+                        sNoncompatScaleDensity = application.getResources().getDisplayMetrics().scaledDensity;
+                    }
+                }
+
+                @Override
+                public void onLowMemory() {
+
+                }
+            });
+        }
+        Log.d(TAG, "sNoncompatDensity:" + sNoncompatDensity + ",sNoncompatScaleDensity:" + sNoncompatScaleDensity);
+        final float targetDensity = appDisplayMetrics.widthPixels / 720;
+        final float targetScaledDensity = targetDensity * (sNoncompatScaleDensity / sNoncompatDensity);
+        final int targetDensityDpi = (int) (160 * targetDensity);
+        Log.d(TAG, "targetDensity:" + targetDensity + ",targetScaledDensity:" + targetScaledDensity + ",targetDensityDpi:" + targetDensityDpi);
+        Log.d(TAG, "appDisplayMetrics.density:" + appDisplayMetrics.density + ",appDisplayMetrics.scaledDensity:" + appDisplayMetrics.scaledDensity + ",appDisplayMetrics.densityDpi:" + appDisplayMetrics.densityDpi);
+        appDisplayMetrics.density = targetDensity;
+        appDisplayMetrics.scaledDensity = targetScaledDensity;
+        appDisplayMetrics.densityDpi = targetDensityDpi;
+
+        final DisplayMetrics activityDisplayMetrics = activity.getResources().getDisplayMetrics();
+        activityDisplayMetrics.density = targetDensity;
+        activityDisplayMetrics.scaledDensity = targetScaledDensity;
+        activityDisplayMetrics.densityDpi = targetDensityDpi;
     }
 
 
