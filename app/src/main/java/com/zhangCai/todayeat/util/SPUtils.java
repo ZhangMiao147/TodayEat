@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
+ * SharedPreferences存储或获取数据
  * Author: zhangmiao
  * Date: 2018/10/23
  */

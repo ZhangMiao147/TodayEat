@@ -20,6 +20,7 @@ import com.zhangCai.todayeat.util.DisplayUtils;
 import com.zhangCai.todayeat.util.SPUtils;
 
 /**
+ * 添加菜单项的弹出框
  * Author: zhangmiao
  * Date: 2018/10/8
  */
@@ -27,11 +28,11 @@ public class AddDialog extends DialogFragment {
 
     private static final String TAG = AddDialog.class.getSimpleName();
 
-    private static final int EDIT_MAX = 10;
+    private static final int EDIT_MAX = 10; //可以输入的最长字符
 
-    EditText et_name;
-    TextView tv_cancel;
-    TextView tv_sure;
+    EditText et_name; //输入框
+    TextView tv_cancel; //取消
+    TextView tv_sure; //确定
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -111,9 +112,12 @@ public class AddDialog extends DialogFragment {
         this.mInputResultListener = inputResultListener;
     }
 
+    /**
+     * 输入框的回调
+     */
     public interface InputResultListener {
-        void result(String input);
+        void result(String input); //输入结果
 
-        void showPrompt(String message);
+        void showPrompt(String message); //显示提示
     }
 }

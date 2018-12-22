@@ -24,8 +24,8 @@ public class MenuAdapter extends BaseAdapter {
 
     private static final String TAG = MenuAdapter.class.getSimpleName();
 
-    private Context mContext;
-    private List<String> mData;
+    private Context mContext; //上下文
+    private List<String> mData; //显示的数据
     private boolean mShowChoose = false; //显示删除选择
     private List<String> mItemChooseList; //被选择的链表
 
@@ -34,6 +34,11 @@ public class MenuAdapter extends BaseAdapter {
         mItemChooseList = new ArrayList<>();
     }
 
+    /**
+     * 添加
+     *
+     * @param name
+     */
     public void addItem(String name) {
         if (mData == null) {
             mData = new ArrayList<>();
@@ -42,6 +47,11 @@ public class MenuAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
+    /**
+     * 添加列表
+     *
+     * @param datas 需要添加的数据
+     */
     public void addItemList(List<String> datas) {
         if (mData == null) {
             mData = new ArrayList<>();
@@ -49,6 +59,11 @@ public class MenuAdapter extends BaseAdapter {
         mData.addAll(datas);
     }
 
+    /**
+     * 获取数据
+     *
+     * @return
+     */
     public List<String> getData() {
         return mData;
     }
@@ -187,6 +202,9 @@ public class MenuAdapter extends BaseAdapter {
         this.mOnChooseListener = onChooseListener;
     }
 
+    /**
+     * 选择回调
+     */
     public interface OnChooseListener {
         void onChooseSize(int size);
     }

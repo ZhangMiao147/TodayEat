@@ -91,10 +91,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate");
-//        setCustomDensity(this,getApplication());
         setContentView(R.layout.activity_main);
         initView();
         hideActionBar();
+        //欢迎界面显示2秒
         iv_welcome.setVisibility(View.VISIBLE);
         iv_welcome.postDelayed(new Runnable() {
             @Override
@@ -137,7 +137,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         int type = event.sensor.getType();
-
         if (type == Sensor.TYPE_ACCELEROMETER) {
             //获取三个方向值
             float[] values = event.values;
@@ -263,10 +262,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     mMenuAdapter.chooseAll();
                 }
                 break;
-
-//            case R.id.activity_main_shake_tips_tv:
-//                shake();
-//                break;
             case R.id.activity_main_delete_tv:
                 //点击删除
                 delete();
@@ -579,6 +574,4 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         activityDisplayMetrics.scaledDensity = targetScaledDensity;
         activityDisplayMetrics.densityDpi = targetDensityDpi;
     }
-
-
 }
