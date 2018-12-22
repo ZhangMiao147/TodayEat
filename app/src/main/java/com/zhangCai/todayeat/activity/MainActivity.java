@@ -58,6 +58,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private static final String DATA_KEY = "menu";
 
+    private ImageView iv_welcome; //欢迎界面
     private ImageView iv_add; //添加菜品按钮
     private LinearLayout ll_none; //还没有菜品时的界面
     private AddDialog mDialog; //添加的dialog
@@ -94,6 +95,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         initView();
         hideActionBar();
+        iv_welcome.setVisibility(View.VISIBLE);
+        iv_welcome.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                iv_welcome.setVisibility(View.GONE);
+            }
+        },2000);
     }
 
     @Override
@@ -169,6 +177,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * 获取界面组件
      */
     private void initView() {
+        iv_welcome = (ImageView)findViewById(R.id.activity_main_welcome_iv);
         iv_add = (ImageView) findViewById(R.id.activity_main_add_iv);
         ll_none = (LinearLayout) findViewById(R.id.activity_main_none_layout_ll);
         gv_menu = (GridView) findViewById(R.id.activity_main_menu_gl);
