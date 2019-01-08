@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void run() {
                 iv_welcome.setVisibility(View.GONE);
             }
-        },2000);
+        }, 2000);
     }
 
     @Override
@@ -176,7 +176,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * 获取界面组件
      */
     private void initView() {
-        iv_welcome = (ImageView)findViewById(R.id.activity_main_welcome_iv);
+        iv_welcome = (ImageView) findViewById(R.id.activity_main_welcome_iv);
         iv_add = (ImageView) findViewById(R.id.activity_main_add_iv);
         ll_none = (LinearLayout) findViewById(R.id.activity_main_none_layout_ll);
         gv_menu = (GridView) findViewById(R.id.activity_main_menu_gl);
@@ -186,12 +186,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mMenuAdapter.setOnChooseListener(new MenuAdapter.OnChooseListener() {
             @Override
             public void onChooseSize(int size) {
-                if (rl_chooseLayout.getVisibility() != View.VISIBLE) {
-                    rl_chooseLayout.setVisibility(View.VISIBLE);
-                    rl_addLayout.setVisibility(View.GONE);
-                    tv_shakeTips.setVisibility(View.GONE);
-                    tv_delete.setVisibility(View.VISIBLE);
-                }
+                showDeleteAndHideAddHead();
                 tv_chooseCount.setText("已选择" + size + "项");
             }
         });
@@ -218,7 +213,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         iv_result.setOnClickListener(this);
         tv_sure.setOnClickListener(this);
 
-        if (mMenuAdapter.getCount() == 0) {
+        showMenuOrEmpty();
+    }
+
+    /**
+     * 隐藏ActionBar
+     */
+    private void hideActionBar() {
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.hide();
+    }
+
+    private void showMenuOrEmpty() {
+        if (mMenuAdapter != null && mMenuAdapter.getCount() == 0) {
             isCanShake = false;
             ll_none.setVisibility(View.VISIBLE);
             gv_menu.setVisibility(View.GONE);
@@ -231,14 +238,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    /**
-     * 隐藏ActionBar
-     */
-    private void hideActionBar() {
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.hide();
-    }
-
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
@@ -248,13 +247,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.activity_main_choose_finish_tv:
                 //点击完成按钮
-                rl_chooseLayout.setVisibility(View.GONE);
-                rl_addLayout.setVisibility(View.VISIBLE);
-                tv_delete.setVisibility(View.GONE);
-                tv_shakeTips.setVisibility(View.VISIBLE);
-                if (mMenuAdapter != null) {
-                    mMenuAdapter.cancelDelete();
-                }
+                showAddAndHideDeleteHead();
                 break;
             case R.id.activity_main_choose_all_tv:
                 //点击全选按钮
@@ -318,6 +311,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
         saveData();
+        showMenuOrEmpty();
+        if (mMenuAdapter != null && mMenuAdapter.getCount() == 0) {
+            showAddAndHideDeleteHead();
+        }
+    }
+
+    private void showAddAndHideDeleteHead() {
+        rl_chooseLayout.setVisibility(View.GONE);
+        rl_addLayout.setVisibility(View.VISIBLE);
+        tv_delete.setVisibility(View.GONE);
+        tv_shakeTips.setVisibility(View.VISIBLE);
+        if (mMenuAdapter != null) {
+            mMenuAdapter.cancelDelete();
+        }
+    }
+
+    private void showDeleteAndHideAddHead() {
+        if (rl_chooseLayout.getVisibility() != View.VISIBLE) {
+            rl_chooseLayout.setVisibility(View.VISIBLE);
+            rl_addLayout.setVisibility(View.GONE);
+            tv_shakeTips.setVisibility(View.GONE);
+            tv_delete.setVisibility(View.VISIBLE);
+        }
     }
 
     /**
@@ -456,6 +472,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             mDialog.dismiss();
                         }
                     }
+                    showMenuOrEmpty();
                 }
 
                 @Override
