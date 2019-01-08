@@ -1,5 +1,5 @@
 # TodayEat (Version 1.0.0)
-![](./icon.png)
+![](https://github.com/ZhangMiao147/TodayEat/blob/master/README_image/icon.png)
 
 《今天吃什么》应用主要是用来决定今天吃什么饭的应用。将选项录入应用中，通过摇一摇得到一个随机的吃饭选项，从而决定今天吃什么。
 
